@@ -10,6 +10,7 @@ const FALSE_POSITIVE = "FALSE POSITIVE -- detected corruption when there was non
 const FALSE_NEGATIVE = "FALSE NEGATIVE -- did not detect corruption";
 const TRUE_POSITIVE = "CORRUPTION DETECTED";
 const TRUE_NEGATIVE = "NO CORRUPTION DETECTED";
+const FULL_MSG_MAXIMUM = 5;
 
 describe("checksum", function() {
 
@@ -22,19 +23,30 @@ describe("checksum", function() {
 
   describe("checksum detects random corruption", function () {
 
+    var failureMessages;
     var failuresThisTest;
+
     beforeEach(function() {
-      failuresThisTest = [];
+      failureMessages = [];
+      failuresThisTest = 0;
     });
 
+    function updateFailures(msg, sentStr, receivedStr) {
+        failuresThisTest += 1;
+        if(failuresThisTest < FULL_MSG_MAXIMUM) {
+          failureMessages.push(msg);
+          saveFailure.addFailure(sentStr, receivedStr);
+        }
+    }
+
     afterEach(function() {
-      let allFailures = failuresThisTest.reduce(function(messageBuilder, current){
+      let firstFailures = failureMessages.slice(0, 5).reduce(function(messageBuilder, current){
         return messageBuilder + current;
       }, '');
 
       // Workaround for https://github.com/mochajs/mocha/issues/1635
       try {
-        assert.lengthOf(failuresThisTest, 0, `${failuresThisTest.length} Failures:\n${allFailures}`);
+        assert.lengthOf(failureMessages, 0, `${failureMessages.length} Failures:\n${firstFailures}`);
       } catch (err){
         this.test.error(err);
       }
@@ -68,10 +80,7 @@ describe("checksum", function() {
         let corrupted = corrupt.shuffleString(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        if(!checksumWorks) failuresThisTest.push(msg);
-        if(!checksumWorks) {
-          failuresThisTest.push(msg);
-        }
+        if(!checksumWorks) updateFailures(msg, input, corrupted)
       }
     });
 
@@ -80,7 +89,7 @@ describe("checksum", function() {
         let corrupted = corrupt.dropBlock(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        if(!checksumWorks) failuresThisTest.push(msg);
+        if(!checksumWorks) updateFailures(msg, input, corrupted)
       }
     });
 
@@ -89,7 +98,7 @@ describe("checksum", function() {
         let corrupted = corrupt.corruptBlockWithRandom(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        if(!checksumWorks) failuresThisTest.push(msg);
+        if(!checksumWorks) updateFailures(msg, input, corrupted)
       }
     });
 
@@ -98,7 +107,7 @@ describe("checksum", function() {
         let corrupted = corrupt.corruptBlockByShuffling(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        if(!checksumWorks) failuresThisTest.push(msg);
+        if(!checksumWorks) updateFailures(msg, input, corrupted)
       }
     });
 
@@ -109,21 +118,21 @@ describe("checksum", function() {
           let corrupted = corrupt.bitShiftOneCharacter(input);
           let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-          if(!checksumWorks) failuresThisTest.push(msg);
+          if(!checksumWorks) updateFailures(msg, input, corrupted)
         }
       }
     });
 
     it("should detect swapping two chacaters", function() {
       for(let input of testStrings) {
-        for(let samples = 0; samples < 30; samples++) {
+        for(let samples = 0; samples < 10; samples++) {
           let x = Math.floor(Math.random() * input.length);
           let y = Math.floor(Math.random() * input.length);
 
           let corrupted = corrupt.swapCharacters(input, x, y);
           let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-          if(!checksumWorks) failuresThisTest.push(msg);
+          if(!checksumWorks) updateFailures(msg, input, corrupted)
         }
       }
     });
@@ -134,7 +143,7 @@ describe("checksum", function() {
       for(let testCase of knownFailures) {
         let [checksumWorks, msg] = checksumDetectionStatus(testCase.input, testCase.corrupted);
 
-        if(!checksumWorks) failuresThisTest.push(msg);;
+        if(!checksumWorks) updateFailures(msg, testCase.input, testCase.corrupted)
       }
     });
   });
@@ -157,10 +166,6 @@ describe("checksum", function() {
 
     if(corrupted !== corruptionDetected){
       let msg = corrupted ? FALSE_NEGATIVE : FALSE_POSITIVE;
-
-      // Before reporting failure, save the failure to our failure memory
-      saveFailure.addFailure(sentStr, receivedStr);
-
       let fullMessage = generateFailureMessage(msg, sentStr, receivedStr, sentChecksum, receivedChecksum)
 
       return [false, fullMessage];
