@@ -1,8 +1,18 @@
-// Global variable for randomly generating an a-zA-Z value
+function computeChecksum(inputString) {
+  if(typeof inputString !== 'string') {
+    throw new TypeError("inputData was not a string.");
+  }
 
+  let hash = 0;
+  if (inputString.length == 0) return hash;
 
-function computeChecksum(importantData) {
-  // Your code here
+  for (let i = 0; i < inputString.length; i++) {
+    let charCode = inputString.charCodeAt(i);
+    hash = ((hash << 5) - hash) + charCode;
+    hash |= 0;
+  }
+
+  return hash;
 }
 
 module.exports = computeChecksum;

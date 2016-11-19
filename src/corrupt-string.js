@@ -9,34 +9,29 @@ module.exports = {
 
      @param {integer} length : the length of the generated string
   */
-  createRandomString: function(length){
+  generateRandomString: function(length){
     let randomString = "";
     for(let i = 0; i < length; i++) {
-      randomString += alphaChars[Math.floor(Math.random() * this.alphaChars.length)];
+      randomString += this.alphaChars[Math.floor(Math.random() * this.alphaChars.length)];
     }
 
     return randomString;
   },
 
   /**
-    Corrupt the input string by selecting a single chracter at random
-    and shift that character's bits one left.
+     Create a string with characters randomly selected from this.alphaChars
 
-    @param {string} inputString
+     @param {integer} number : the number of strings to generate
+     @param {integer} length : the length of each generated string
   */
-  shiftOneCharacter: function(inputString) {
-    let bitLocation = Math.floor(Math.random() * inputString.length);
-    let stringBuilder = "";
-    for(let i = 0; i < inputString.length; i++) {
-      let character = inputString[i];
-      if(i === bitLocation){
-        character = character << 1;
-      }
+  generateRandomStrings: function (number, length) {
+    let strings = [];
 
-      stringBuilder += character;
+    for(let i = 0; i < howMany; i++) {
+      strings.push(this.generateRandomString(stringLength))
     }
-    return stringBuilder;
 
+    return strings;
   },
 
   /**
@@ -66,7 +61,7 @@ module.exports = {
 
     let corruptionSize = Math.ceil(Math.random() * inputString.length);
     let corruptionLocation = Math.floor(Math.random() * (inputString.length - 1));
-    let corruptBlock = this.createRandomString(corruptionSize);
+    let corruptBlock = this.generateRandomString(corruptionSize);
     let corruptString = corruptinputString.split('').splice(corruptionLocation, corruptionSize, ...corruptBlock);
 
     return corruptString;
@@ -87,5 +82,26 @@ module.exports = {
     inputAsArray[y] = temp;
 
     return inputAsArray.join("");
-  }
+  },
+
+  /**
+    Corrupt the input string by selecting a single chracter at random
+    and shift that character's bits one left.
+
+    @param {string} inputString
+  */
+  bitShiftOneCharacter: function(inputString) {
+    let bitLocation = Math.floor(Math.random() * inputString.length);
+    let stringBuilder = "";
+    for(let i = 0; i < inputString.length; i++) {
+      let character = inputString[i];
+      if(i === bitLocation){
+        character = character << 1;
+      }
+
+      stringBuilder += character;
+    }
+    return stringBuilder;
+
+  },
 }
