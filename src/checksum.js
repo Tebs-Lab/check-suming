@@ -1,10 +1,6 @@
 const crypto = require('crypto');
 
 function charcodeSum(inputString){
-  if(typeof inputString !== 'string') {
-    throw new TypeError("inputData was not a string.");
-  }
-
   var sum = 0;
   for(var i = 0; i < inputString.length; i++) {
     sum += inputString.charCodeAt(i);
@@ -14,10 +10,6 @@ function charcodeSum(inputString){
 
 
 function charcodeTimesIndex(inputString){
-  if(typeof inputString !== 'string') {
-    throw new TypeError("inputData was not a string.");
-  }
-
   var sum = 0;
   for(var i = 0; i < inputString.length; i++) {
     sum += inputString.charCodeAt(i) * (i+1);
@@ -27,18 +19,25 @@ function charcodeTimesIndex(inputString){
 }
 
 
-function javaHashCode(inputString) {
-  if(typeof inputString !== 'string') {
-    throw new TypeError("inputData was not a string.");
-  }
-
+function hashCodeShift(inputString) {
   let hash = 0;
   if (inputString.length == 0) return hash;
 
   for (let i = 0; i < inputString.length; i++) {
     let charCode = inputString.charCodeAt(i);
     hash = ((hash << 5) - hash) + charCode;
-    hash |= 0;
+  }
+
+  return hash.toString(16);
+}
+
+function hashCodePrimeMultiplier(inputString) {
+  let hash = 0;
+  let primeNumber = 31;
+  for (let i = 0; i < inputString.length; i++) {
+    let charCode = inputString.charCodeAt(i)
+    hash = (primeNumber * hash) + charCode;
+    hash |= 0; //Cast to 32 bits, significantly improves collision rate
   }
 
   return hash.toString(16);
@@ -46,6 +45,7 @@ function javaHashCode(inputString) {
 
 // For a list of usable digets use this command in your terminal
 // openssl list-message-digest-algorithms
+// All these algorithms should NEVER produce a collision, otherwise internet security is compromised.
 const HASH_ALGORITHM = 'sha256';
 function cryptoPackage(inputString) {
   return crypto.createHash(HASH_ALGORITHM, 'AnySecretWillDo')
@@ -53,4 +53,4 @@ function cryptoPackage(inputString) {
                    .digest('hex');
 }
 
-module.exports = cryptoPackage;
+module.exports = hashCodePrimeMultiplier;
