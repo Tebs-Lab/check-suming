@@ -11,47 +11,6 @@ const FALSE_NEGATIVE = "FALSE NEGATIVE -- did not detect corruption";
 const TRUE_POSITIVE = "CORRUPTION DETECTED";
 const TRUE_NEGATIVE = "NO CORRUPTION DETECTED";
 
-/**
-  This function helps test if the checksum algorithm works.
-  We accept two strings, mocking the sender and receiever,
-  compute the checksum on both, and report whether the checksum
-  detects corruption correctly.
-
-  We return an array where the first value is success/failure
-  and the second is a message about the success/failure
-*/
-function checksumDetectionStatus(sentStr, receivedStr) {
-  let sentChecksum = computeChecksum(sentStr);
-  let receivedChecksum = computeChecksum(receivedStr);
-
-  let corrupted = sentStr !== receivedStr;
-  let corruptionDetected = sentChecksum !== receivedChecksum;
-
-  if(corrupted !== corruptionDetected){
-    let msg = corrupted ? FALSE_NEGATIVE : FALSE_POSITIVE;
-
-    // Before reporting failure, save the failure to our failure memory
-    saveFailure.addFailure(sentStr, receivedStr);
-
-    let fullMessage = generateFailureMessage(msg, sentStr, receivedStr, sentChecksum, receivedChecksum)
-
-    return [false, fullMessage];
-  }
-
-  let msg = corrupted ? TRUE_POSITIVE : TRUE_NEGATIVE;
-  return [true, msg];
-}
-
-function generateFailureMessage(msg, sentStr, receivedStr, sentChecksum, receivedChecksum) {
-  return(
-  `
-  =========================
-  ${msg} DETECTED
-  input:     ${sentStr} : ${sentChecksum}
-  corrupted: ${receivedStr} : ${receivedChecksum}
-  `);
-}
-
 describe("checksum", function() {
 
   const sampleLengths = [1, 2, 4, 8, 16, 32, 64];
@@ -63,6 +22,25 @@ describe("checksum", function() {
 
   describe("checksum detects random corruption", function () {
 
+    var failuresThisTest;
+    beforeEach(function() {
+      failuresThisTest = [];
+    });
+
+    afterEach(function() {
+      let allFailures = failuresThisTest.reduce(function(messageBuilder, current){
+        return messageBuilder + current;
+      }, '');
+
+      // Workaround for https://github.com/mochajs/mocha/issues/1635
+      try {
+        assert.lengthOf(failuresThisTest, 0, `${failuresThisTest.length} Failures:\n${allFailures}`);
+      } catch (err){
+        this.test.error(err);
+      }
+    });
+
+    // ===================== TESTS ====================
     it("should throw a TypeError for all non-string input", function() {
       let unsafeData = [{}, [], undefined, null, true, 0];
 
@@ -90,7 +68,10 @@ describe("checksum", function() {
         let corrupted = corrupt.shuffleString(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        assert.isTrue(checksumWorks, msg)
+        if(!checksumWorks) failuresThisTest.push(msg);
+        if(!checksumWorks) {
+          failuresThisTest.push(msg);
+        }
       }
     });
 
@@ -99,7 +80,7 @@ describe("checksum", function() {
         let corrupted = corrupt.dropBlock(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        assert.isTrue(checksumWorks, msg)
+        if(!checksumWorks) failuresThisTest.push(msg);
       }
     });
 
@@ -108,7 +89,7 @@ describe("checksum", function() {
         let corrupted = corrupt.corruptBlockWithRandom(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        assert.isTrue(checksumWorks, msg)
+        if(!checksumWorks) failuresThisTest.push(msg);
       }
     });
 
@@ -117,7 +98,7 @@ describe("checksum", function() {
         let corrupted = corrupt.corruptBlockByShuffling(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        assert.isTrue(checksumWorks, msg)
+        if(!checksumWorks) failuresThisTest.push(msg);
       }
     });
 
@@ -128,7 +109,7 @@ describe("checksum", function() {
           let corrupted = corrupt.bitShiftOneCharacter(input);
           let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-          assert.isTrue(checksumWorks, msg)
+          if(!checksumWorks) failuresThisTest.push(msg);
         }
       }
     });
@@ -142,7 +123,7 @@ describe("checksum", function() {
           let corrupted = corrupt.swapCharacters(input, x, y);
           let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-          assert.isTrue(checksumWorks, msg)
+          if(!checksumWorks) failuresThisTest.push(msg);
         }
       }
     });
@@ -153,8 +134,49 @@ describe("checksum", function() {
       for(let testCase of knownFailures) {
         let [checksumWorks, msg] = checksumDetectionStatus(testCase.input, testCase.corrupted);
 
-        assert.isTrue(checksumWorks, msg);
+        if(!checksumWorks) failuresThisTest.push(msg);;
       }
     });
   });
+
+  /**
+    This function helps test if the checksum algorithm works.
+    We accept two strings, mocking the sender and receiever,
+    compute the checksum on both, and report whether the checksum
+    detects corruption correctly.
+
+    We return an array where the first value is success/failure
+    and the second is a message about the success/failure
+  */
+  function checksumDetectionStatus(sentStr, receivedStr) {
+    let sentChecksum = computeChecksum(sentStr);
+    let receivedChecksum = computeChecksum(receivedStr);
+
+    let corrupted = sentStr !== receivedStr;
+    let corruptionDetected = sentChecksum !== receivedChecksum;
+
+    if(corrupted !== corruptionDetected){
+      let msg = corrupted ? FALSE_NEGATIVE : FALSE_POSITIVE;
+
+      // Before reporting failure, save the failure to our failure memory
+      saveFailure.addFailure(sentStr, receivedStr);
+
+      let fullMessage = generateFailureMessage(msg, sentStr, receivedStr, sentChecksum, receivedChecksum)
+
+      return [false, fullMessage];
+    }
+
+    let msg = corrupted ? TRUE_POSITIVE : TRUE_NEGATIVE;
+    return [true, msg];
+  }
+
+  function generateFailureMessage(msg, sentStr, receivedStr, sentChecksum, receivedChecksum) {
+    return(
+    `
+    =========================
+    ${msg} DETECTED
+    input:     ${sentStr} : ${sentChecksum}
+    corrupted: ${receivedStr} : ${receivedChecksum}
+    `);
+  }
 });
