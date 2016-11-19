@@ -1,5 +1,8 @@
 const crypto = require('crypto');
 
+/**
+  a very simple checksum that sums the charCodes of each character.
+*/
 function charcodeSum(inputString){
   var sum = 0;
   for(var i = 0; i < inputString.length; i++) {
@@ -8,7 +11,10 @@ function charcodeSum(inputString){
   return sum.toString(16);
 }
 
-
+/**
+  Another simple checksum that uses the index and the charCode to
+  create the hash.
+*/
 function charcodeTimesIndex(inputString){
   var sum = 0;
   for(var i = 0; i < inputString.length; i++) {
@@ -18,7 +24,10 @@ function charcodeTimesIndex(inputString){
   return sum.toString(16);
 }
 
-
+/**
+  A common strategy for "non-cryptographic" hashing -- use bitshifts
+  and the charCode to create the hash.
+*/
 function hashCodeShift(inputString) {
   let hash = 0;
   if (inputString.length == 0) return hash;
@@ -31,6 +40,11 @@ function hashCodeShift(inputString) {
   return hash.toString(16);
 }
 
+/**
+  Another "non-cryptographic" hash -- instead of bit shifting we multiply
+  by a small prime number then uses a bitwise or to coerse the output to
+  a 32bit integer.
+*/
 function hashCodePrimeMultiplier(inputString) {
   let hash = 0;
   let primeNumber = 31;
@@ -43,14 +57,19 @@ function hashCodePrimeMultiplier(inputString) {
   return hash.toString(16);
 }
 
-// For a list of usable digets use this command in your terminal
-// openssl list-message-digest-algorithms
-// All these algorithms should NEVER produce a collision, otherwise internet security is compromised.
-const HASH_ALGORITHM = 'sha256';
+/**
+  A small wrapper that allows us to use the node Crypto package,
+  this allows us to use well, cryptographically secure hashes
+  implemented in OpenSSL. To get a list of valid values for
+  HASH_ALGORITHM type this into your terminal:
+
+  openssl list-message-digest-commands
+*/
+const HASH_ALGORITHM = 'sha1';
 function cryptoPackage(inputString) {
   return crypto.createHash(HASH_ALGORITHM, 'AnySecretWillDo')
                    .update(inputString)
                    .digest('hex');
 }
 
-module.exports = hashCodePrimeMultiplier;
+module.exports = cryptoPackage;
