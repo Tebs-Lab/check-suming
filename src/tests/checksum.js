@@ -1,6 +1,9 @@
+'use strict'
+
 const computeChecksum = require('../checksum');
 const corrupt = require('../corrupt-string');
 const generate = require('../string-generator');
+const saveFailure = require('./failure-memory/save-failure-case');
 const assert = require('chai').assert
 
 const FALSE_POSITIVE = "FALSE POSITIVE -- detected corruption when there was none"
@@ -26,23 +29,44 @@ function checksumDetectionStatus(sentStr, receivedStr) {
 
   if(corrupted !== corruptionDetected){
     let msg = corrupted ? FALSE_NEGATIVE : FALSE_POSITIVE;
-    return [false, msg];
+
+    // Before reporting failure, save the failure to our failure memory
+    saveFailure.addFailure(sentStr, receivedStr);
+
+    let fullMessage = generateFailureMessage(msg, sentStr, receivedStr, sentChecksum, receivedChecksum)
+
+    return [false, fullMessage];
   }
 
   let msg = corrupted ? TRUE_POSITIVE : TRUE_NEGATIVE;
   return [true, msg];
 }
 
+function generateFailureMessage(msg, sentStr, receivedStr, sentChecksum, receivedChecksum) {
+  return(
+  `
+  =========================
+  ${msg} DETECTED
+  input:     ${sentStr} : ${sentChecksum}
+  corrupted: ${receivedStr} : ${receivedChecksum}
+  `);
+}
+
 describe("checksum", function() {
 
-  const testStrings = generate.generateRandomSample(50, 256);
+  const sampleLengths = [1, 2, 4, 8, 16, 32, 64];
+  const testStrings = generate.generateRandomSamples(500, sampleLengths);
+
+  after(function() {
+    saveFailure.serializeFailures();
+  })
 
   describe("checksum detects random corruption", function () {
 
     it("should throw a TypeError for all non-string input", function() {
       let unsafeData = [{}, [], undefined, null, true, 0];
 
-      for(data of unsafeData) {
+      for(let data of unsafeData) {
         let boundChecksum = computeChecksum.bind(null, data);
 
         assert.throws(boundChecksum, TypeError);
@@ -50,7 +74,7 @@ describe("checksum", function() {
     });
 
     it("should deterministically return the same result for the same input", function() {
-      for(randomString of testStrings) {
+      for(let randomString of testStrings) {
         let baseline = computeChecksum(randomString)
 
         for(let trials = 0; trials < 16; trials++) {
@@ -62,64 +86,74 @@ describe("checksum", function() {
     });
 
     it("should detect shuffling the input string", function() {
-      for(input of testStrings) {
+      for(let input of testStrings) {
         let corrupted = corrupt.shuffleString(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        assert.isTrue(checksumWorks, `${msg} for input:   ${input}\n corrupted: ${corrupted}`)
+        assert.isTrue(checksumWorks, msg)
       }
     });
 
     it("should detect dropping a chunk of data", function() {
-      for(input of testStrings) {
+      for(let input of testStrings) {
         let corrupted = corrupt.dropBlock(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        assert.isTrue(checksumWorks, `${msg} for input:   ${input}\n corrupted: ${corrupted}`)
+        assert.isTrue(checksumWorks, msg)
       }
     });
 
     it("should detect replacing a chunk of data with random data", function() {
-      for(input of testStrings) {
+      for(let input of testStrings) {
         let corrupted = corrupt.corruptBlockWithRandom(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        assert.isTrue(checksumWorks, `${msg} for input:   ${input}\n corrupted: ${corrupted}`)
+        assert.isTrue(checksumWorks, msg)
       }
     });
 
     it("should detect randomly shuffling a chunk of data", function() {
-      for(input of testStrings) {
+      for(let input of testStrings) {
         let corrupted = corrupt.corruptBlockByShuffling(input);
         let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-        assert.isTrue(checksumWorks, `${msg} for input:   ${input}\n corrupted: ${corrupted}`)
+        assert.isTrue(checksumWorks, msg)
       }
     });
 
     it("should detect bit shifting single characters within the string", function() {
       this.timeout(30000); // 30 seconds, this is an exhaustive test
-      for(input of testStrings) {
+      for(let input of testStrings) {
         for(let samples = 0; samples < input.length; samples++) {
           let corrupted = corrupt.bitShiftOneCharacter(input);
           let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
 
-          assert.isTrue(checksumWorks, `${msg} for input:   ${input}\n corrupted: ${corrupted}`)
+          assert.isTrue(checksumWorks, msg)
         }
       }
     });
 
-    it("should detect swapping any two chacaters", function() {
-      this.timeout(30000); // 30 seconds, this is an exhaustive test
-      for(input of testStrings) {
-        for(let x = 0; x < input.length; x++) {
-          for(let y = x; y < input.length; y++) {
-            let corrupted = corrupt.swapCharacters(input, x, y);
-            let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
+    it("should detect swapping two chacaters", function() {
+      for(let input of testStrings) {
+        for(let samples = 0; samples < 30; samples++) {
+          let x = Math.floor(Math.random() * input.length);
+          let y = Math.floor(Math.random() * input.length);
 
-            assert.isTrue(checksumWorks, `${msg} for input:   ${input}\n corrupted: ${corrupted}`)
-          }
+          let corrupted = corrupt.swapCharacters(input, x, y);
+          let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
+
+          assert.isTrue(checksumWorks, msg)
         }
+      }
+    });
+
+    it("Should handle previously found failure cases", function() {
+      let knownFailures = saveFailure.fetchKnownFailures();
+
+      for(let testCase of knownFailures) {
+        let [checksumWorks, msg] = checksumDetectionStatus(testCase.input, testCase.corrupted);
+
+        assert.isTrue(checksumWorks, msg);
       }
     });
   });

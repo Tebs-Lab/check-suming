@@ -40,38 +40,15 @@ module.exports = {
      be represented.
 
      @param {integer} number : the number of strings to generate of each length
-     @param {integer} maxLength : the largest length to generate
+     @param {Array} lenghts : the lengths of string samples to generate
   */
-  generateRandomSample: function (number, maxLength) {
+  generateRandomSamples: function (number, lengths) {
     let strings = [];
 
-    for(let length = 1; length < number; length++) {
+    for(let length of lengths) {
       strings = strings.concat(this.generateRandomStrings(number, length))
     }
 
     return strings;
-  },
-
-  /**
-     Return a list of all possible strings up to the passed in length that
-     contain only letters from this.alphaChars starting with a specified
-     prefix. If the prefix is not specified, it defaults to the empty string
-
-     @param {integer} length : the length of each generated string
-     @param {string} length : the prefix
-  */
-  generateAllPermutations: function (length, prefix = "") {
-    let permutations = [];
-
-    if(prefix.length < length) {
-      permutations.push(prefix);
-
-      for(let letter of this.alphaChars) {
-        let nextPermutation = prefix + letter;
-        permutations = permutations.concat(this.generateAllPermutations(length, nextPermutation));
-      }
-    }
-
-    return permutations;
   }
 }
