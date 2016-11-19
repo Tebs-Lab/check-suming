@@ -1,8 +1,11 @@
 const computeChecksum = require('../checksum');
 const corrupt = require('../corrupt-string');
+const generate = require('../string-generator');
 const assert = require('chai').assert
 
 describe("checksum", function() {
+
+  const testStrings = generate.generateRandomSample(50, 256);
 
   describe("checksum detects random corruption", function () {
 
@@ -16,17 +19,12 @@ describe("checksum", function() {
     });
 
     it("should deterministically return the same result for the same input", function() {
-      for(let stringLength = 0; stringLength < 64; stringLength++) {
-        let strings = corrupt.generateRandomStrings(20, 256)
+      for(randomString of testStrings) {
+        let baseline = computeChecksum(randomString)
 
-        for(string of strings) {
-          let randomString = corrupt.generateRandomString(stringLength);
-          let baseline = computeChecksum(randomString)
-
-          for(let trials = 0; trials < 16; trials++) {
-            let checksum = computeChecksum(randomString);
-            assert.equal(checksum, baseline);
-          }
+        for(let trials = 0; trials < 16; trials++) {
+          let checksum = computeChecksum(randomString);
+          assert.equal(checksum, baseline);
         }
       }
     });

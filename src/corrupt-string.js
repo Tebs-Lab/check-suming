@@ -1,39 +1,7 @@
 'use strict'
+const stringGenerator = require('./string-generator');
 
 module.exports = {
-  // The set of allowed characters
-  alphaChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-
-  /**
-     Create a string with characters randomly selected from this.alphaChars
-
-     @param {integer} length : the length of the generated string
-  */
-  generateRandomString: function(length){
-    let randomString = "";
-    for(let i = 0; i < length; i++) {
-      randomString += this.alphaChars[Math.floor(Math.random() * this.alphaChars.length)];
-    }
-
-    return randomString;
-  },
-
-  /**
-     Create a string with characters randomly selected from this.alphaChars
-
-     @param {integer} number : the number of strings to generate
-     @param {integer} length : the length of each generated string
-  */
-  generateRandomStrings: function (number, length) {
-    let strings = [];
-
-    for(let i = 0; i < howMany; i++) {
-      strings.push(this.generateRandomString(stringLength))
-    }
-
-    return strings;
-  },
-
   /**
     Return a string with the same characters in the same quantity
     but in a random order.
@@ -49,7 +17,6 @@ module.exports = {
     return arr.join("");
   },
 
-
   /**
     Randomly select a randomly lengthed section of the input string
     and replace it with new random charcaters.
@@ -61,7 +28,7 @@ module.exports = {
 
     let corruptionSize = Math.ceil(Math.random() * inputString.length);
     let corruptionLocation = Math.floor(Math.random() * (inputString.length - 1));
-    let corruptBlock = this.generateRandomString(corruptionSize);
+    let corruptBlock = stringGenerator.generateRandomString(corruptionSize);
     let corruptString = corruptinputString.split('').splice(corruptionLocation, corruptionSize, ...corruptBlock);
 
     return corruptString;
@@ -101,7 +68,7 @@ module.exports = {
 
       stringBuilder += character;
     }
-    return stringBuilder;
 
-  },
+    return stringBuilder;
+  }
 }

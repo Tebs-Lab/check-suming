@@ -18,4 +18,12 @@ describe("corrupt-string", function() {
   xdescribe("corruptBlock", function() {
 
   });
-}
+
+  xdescribe("swapCharacters", function() {
+
+  });
+
+  xdescribe("bitShiftOneCharacter", function() {
+
+  });
+});
