@@ -1,0 +1,17 @@
+{
+  "name": "hash-function-interactive-textbook",
+  "version": "0.0.1",
+  "description": "An experimental educational product",
+  "main": "''",
+  "directories": {
+    "test": "./src/tests"
+  },
+  "scripts": {
+    "test": "mocha ./src/tests"
+  },
+  "author": "Tyler Bettilyon",
+  "license": "MIT",
+  "dependencies": {
+    "chai": "^3.5.0"
+  }
+}

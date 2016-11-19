@@ -2,7 +2,7 @@
 
 module.exports = {
   // The set of allowed characters
-  alphaChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  alphaChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 
   /**
      Create a string with characters randomly selected from this.alphaChars
@@ -16,7 +16,7 @@ module.exports = {
     }
 
     return randomString;
-  }
+  },
 
   /**
     Corrupt the input string by selecting a single chracter at random
@@ -37,7 +37,7 @@ module.exports = {
     }
     return stringBuilder;
 
-  }
+  },
 
   /**
     Return a string with the same characters in the same quantity
@@ -52,7 +52,7 @@ module.exports = {
     });
 
     return arr.join("");
-  }
+  },
 
 
   /**
@@ -70,19 +70,7 @@ module.exports = {
     let corruptString = corruptinputString.split('').splice(corruptionLocation, corruptionSize, ...corruptBlock);
 
     return corruptString;
-  }
-
-  /**
-    Corrupt the inputString by swapping two adjacent characters.
-
-    @param {string} inputString
-  */
-  corruptBySwapping: function(inputString){
-
-    let corruptionLocation = Math.floor(Math.random() * (inputString.length - 2));
-
-    return this.swapCharacters(inputString, corruptionLocation, corruptionLocation + 1);
-  }
+  },
 
   /**
     Return a string with the values at indicies x and y swapped.
@@ -100,5 +88,4 @@ module.exports = {
 
     return inputAsArray.join("");
   }
-
 }

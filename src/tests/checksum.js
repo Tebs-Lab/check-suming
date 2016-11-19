@@ -1,12 +1,18 @@
 const computeChecksum = require('../checksum');
-const corrupt = require('../lib/corrupt-string');
+const corrupt = require('../corrupt-string');
 const assert = require('chai').assert
 
 describe("checksum", function() {
 
   describe("checksum detects random corruption", function () {
-    xit("should throw an error for non-string input", function() {
 
+    it("should throw a TypeError for all non-string input", function() {
+      let unsafeData = [{}, [], undefined, null, true, 0];
+
+      for(data of unsafeData) {
+        let boundChecksum = computeChecksum.bind(null, data);
+        assert.throws(boundChecksum, TypeError);
+      }
     });
 
     xit("should deterministically return the same result for the same input", function() {
