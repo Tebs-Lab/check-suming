@@ -97,6 +97,18 @@ describe("checksum", function() {
       }
     });
 
+    it("should detect bit shifting single characters within the string", function() {
+      this.timeout(30000); // 30 seconds, this is an exhaustive test
+      for(input of testStrings) {
+        for(let samples = 0; samples < input.length; samples++) {
+          let corrupted = corrupt.bitShiftOneCharacter(input);
+          let [checksumWorks, msg] = checksumDetectionStatus(input, corrupted);
+
+          assert.isTrue(checksumWorks, `${msg} for input:   ${input}\n corrupted: ${corrupted}`)
+        }
+      }
+    });
+
     it("should detect swapping any two chacaters", function() {
       this.timeout(30000); // 30 seconds, this is an exhaustive test
       for(input of testStrings) {
