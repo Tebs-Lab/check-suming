@@ -12,6 +12,7 @@
   "author": "Tyler Bettilyon",
   "license": "MIT",
   "dependencies": {
-    "chai": "^3.5.0"
+    "chai": "^3.5.0",
+    "mocha": "^3.1.2"
   }
 }
