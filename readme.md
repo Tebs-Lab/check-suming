@@ -22,7 +22,7 @@ Internet traffic often depends on the use of checksums to consistently deliver u
 
 ## How Checksums Work
 
-Every time we send data, we compute and send a checksum as well. This checksum is the "hash value" of a hash algorithm known by both the sending and receiving computers. This hash value is a [digital signature](https://en.wikipedia.org/wiki/Digital_signature) of the actual data we want to send, and we call it the checksum. When the message is received, the receiver gets the data as well as the checksum. The receiver then sends the data it receiver through the same algorithm -- if the produced hash value matches the checksum then the data was probably not corrupted!
+Every time we send data, we compute and send a checksum as well. This checksum is the "hash value" of a hash algorithm known by both the sending and receiving computers. This hash value is a [digital signature](https://en.wikipedia.org/wiki/Digital_signature) of the actual data we want to send, and we call it the checksum. When the message is received, the receiver gets the data as well as the checksum. The receiver then sends the data it received through the same algorithm -- if the produced hash value matches the checksum then the data was probably not corrupted!
 
 The [SHA-2 Family](https://en.wikipedia.org/wiki/SHA-2) of algorithms are an example of an algorithm commonly used for computing checksums.
 
