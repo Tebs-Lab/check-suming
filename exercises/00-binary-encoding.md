@@ -15,6 +15,8 @@ To better understand how "arbitrary data" can be represented in binary, we're go
 
 Once you've got your translations written down, throw them into the converter to check your answer.
 
+Now that you've used a little bit of `ascii`, consider watching this [fantastic video](https://www.youtube.com/watch?v=MijmeoH9LT4) which delves into the background of `ascii`, `unicode` and the binary encoding of strings generally. 
+
 ## Bonus:
 
 Open the developer console on the converter pages and see if you can find the file `bhc.js` (what do you think that stands for?). There are several functions find two named "convertHex" and "convertDec" do the majority of the work.
