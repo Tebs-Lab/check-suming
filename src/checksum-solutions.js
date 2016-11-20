@@ -19,7 +19,7 @@ module.exports = {
     for(var i = 0; i < inputString.length; i++) {
       sum += inputString.charCodeAt(i);
     }
-    return sum.toString(16);
+    return sum;
   },
 
   /**
@@ -32,7 +32,7 @@ module.exports = {
       sum += inputString.charCodeAt(i) * (i+1);
     }
 
-    return sum.toString(16);
+    return sum;
   },
 
   /**
@@ -48,7 +48,7 @@ module.exports = {
       hash = ((hash << 5) - hash) + charCode;
     }
 
-    return hash.toString(16);
+    return hash;
   },
 
   /**
@@ -65,7 +65,7 @@ module.exports = {
       hash |= 0; //Cast to 32 bits, significantly improves collision rate
     }
 
-    return hash.toString(16);
+    return hash;
   },
 
   /**
@@ -78,8 +78,11 @@ module.exports = {
   */
   cryptoPackage: function(inputString) {
     let hashAlgorithm = 'sha1';
-    return crypto.createHash(hashAlgorithm, 'AnySecretWillDo')
+    let v = crypto.createHash(hashAlgorithm, 'AnySecretWillDo')
                      .update(inputString)
                      .digest('hex');
+
+    v = parseInt(v, 16); // In order to follow my own challenge of returning an integer
+    return v
   }
 }
