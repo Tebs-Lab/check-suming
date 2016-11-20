@@ -25,3 +25,7 @@ Every time we send data, we compute and send a checksum as well. This checksum i
 The [SHA-2 Family](https://en.wikipedia.org/wiki/SHA-2) of algorithms are an example of an algorithm commonly used for computing checksums.
 
 It is worth noting that both the checksum and the data itself might have been corrupted. For our checksum algorithm to be effective we don't need to know *which one* was corrupted -- just that corruption has occurred.
+
+## Now, You Must Practice
+
+Head to the exercises folder for a description of how to use this repository to practice creating and testing checksums. 
