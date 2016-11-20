@@ -1,5 +1,3 @@
-# Finally: Checksums
-
 ## Getting Started
 
 Before you can get started, get the libraries we need:
