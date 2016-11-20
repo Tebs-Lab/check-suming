@@ -1,25 +1,31 @@
 'use strict'
 
+const alphaChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 module.exports = {
-  // The set of allowed characters
-  alphaChars: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  /**
+    Generate a random character within the allowed string-set for Javascript
+  */
+  getRandomCharacter: function() {
+    return alphaChars[Math.floor(Math.random() * alphaChars.length)];
+  },
 
   /**
-     Create a string with characters randomly selected from this.alphaChars
+     Create a string with randomly generated characters.
 
      @param {integer} length : the length of the generated string
   */
   generateRandomString: function(length){
     let randomString = "";
     for(let i = 0; i < length; i++) {
-      randomString += this.alphaChars[Math.floor(Math.random() * this.alphaChars.length)];
+      randomString += this.getRandomCharacter();
     }
 
     return randomString;
   },
 
   /**
-     Create a string with characters randomly selected from this.alphaChars
+     Create a list of strings with randomly selected characters
 
      @param {integer} number : the number of strings to generate
      @param {integer} length : the length of each generated string
@@ -35,18 +41,17 @@ module.exports = {
   },
 
   /**
-     Create a series of strings with characters randomly selected from this.alphaChars.
-     there will be number of strings per length, and all lenghts from 0-maxLength will
-     be represented.
+     Create a series of strings with randomly selected characters. This array will
+     contain n strings for each length provided in the input array.
 
-     @param {integer} number : the number of strings to generate of each length
+     @param {integer} n : the n of strings to generate of each length
      @param {Array} lenghts : the lengths of string samples to generate
   */
-  generateRandomSamples: function (number, lengths) {
+  generateRandomSamples: function (n, lengths) {
     let strings = [];
 
     for(let length of lengths) {
-      strings = strings.concat(this.generateRandomStrings(number, length))
+      strings = strings.concat(this.generateRandomStrings(n, length))
     }
 
     return strings;

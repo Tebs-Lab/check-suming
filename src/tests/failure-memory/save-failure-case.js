@@ -3,8 +3,14 @@ const fs = require('fs');
 const fileLocation = __dirname + '/previously-caught-failures.json';
 
 // We load the failures once
-let strData = fs.readFileSync(fileLocation).toString();
-const knownFailures = JSON.parse(strData);
+let knownFailures = [];
+
+try {
+  let strData = fs.readFileSync(fileLocation).toString();
+  knownFailures = JSON.parse(strData);
+} catch (err) {
+  // Failed to read, leave known failures empty
+}
 
 module.exports = {
     addFailure: function(input, corrupted) {

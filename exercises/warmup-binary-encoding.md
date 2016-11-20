@@ -1,4 +1,4 @@
-## Warm-up: Binary Encoding
+## Warmup: Binary Encoding
 
 First, lets look at an example of how text data can be turned into a series of __bits__. This process is called __binary encoding__ and there are many different rules for encoding strings to binary data. Try this [text to binary encoder](http://www.binaryhexconverter.com/ascii-text-to-binary-converter). It uses one such rule-set to change text into binary, specifically this website uses a protocol called [`ascii`](https://en.wikipedia.org/wiki/ASCII). We can also [convert the binary back into text](http://www.binaryhexconverter.com/binary-to-ascii-text-converter) using a backwards converter. In `ascii` each character is 8 bits long, and each "bit pattern" uniquely represents a single character.
 
