@@ -26,7 +26,7 @@ module.exports = {
   dropBlock: function(inputString){
     let corruptedString = "";
 
-    let corruptionSize = Math.ceil(Math.random() * inputString.length);
+    let corruptionSize = 1 + Math.ceil(Math.random() * (inputString.length - 1));
     let corruptionLocation = Math.floor(Math.random() * (inputString.length - 1));
 
     let corruptString = inputString.split('');

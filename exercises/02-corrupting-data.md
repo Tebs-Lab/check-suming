@@ -13,10 +13,12 @@ In an attempt to simulate both corruption, and malicious users, you're going to 
 
 Practicing this kind of manipulation will help you get into the mindset of a hacker. Many of these corruptions were designed specifically in order to break some of the hash functions found in the `/src/solutions/checksum.js` file. When security experts work on creating a __collision attack__ they have to think deeply about the algorithm and how to generate specific data that will result in a collision -- these corruption functions are no different.
 
-Complete the functions in `/src/corrupt-string.js`. Descriptions of each function are found in the comments. For further documentation, read the test file. 
+Complete the functions in `/src/corrupt-string.js`. Descriptions of each function are found in the comments.
+
+## Bonus: Testing
+
+While some tests are provided to test that your corruption methods are working, they are not sufficient to prove that your code definitely corrupts the data. In fact, there are "pending" tests marked by `xdescribe` and `xit` blocks which do not have tests filled in. Could you write code that satisfies the constraints described in the tests?
 
 ## Remember:
 
-You can skip ahead by using the solutions found in `/src/solutions/corrupt-string.js`. You can also skip ahead and then come back to implementing the corruption techniques yourself after building the checksums.
-
-After working on checksum yourself, look at the solutions and see if you can figure out which of my provided solutions are going to be most vulnerable to specific kinds of corruption!
+You can skip ahead by using the solutions found in `/src/solutions/corrupt-string.js`. You can also skip ahead and then come back to implementing the corruption techniques yourself after building the checksums. After working on checksum yourself, look at the solutions and see if you can figure out which of my provided solutions are going to be most vulnerable to specific kinds of corruption!
