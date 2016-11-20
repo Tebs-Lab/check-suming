@@ -1,7 +1,7 @@
 'use strict'
 
 const checksumLib = require('../checksum');
-const corrupt = require('./corrupt-string');
+const corrupt = require('../corrupt-string');
 const generate = require('../string-generator');
 const saveFailure = require('./failure-memory/save-failure-case');
 const assert = require('chai').assert
