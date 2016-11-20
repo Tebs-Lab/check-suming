@@ -8,10 +8,7 @@ npm test
 
 The test suite utilizes random as input and then uses several techniques to "corrupt" the data. Because the tests are random, you may encounter a new failure after running the tests a couple of times. That said, once you've encountered a failure case, it will be saved into a JSON object located at: `/src/tests/failure-memory/previously-caught-failures.json`.
 
-Once these failures are saved, they will always be rerun. You can reset these failure cases by replacing the text in the file `previously-caught-failures.json` with the following:
+Once these failures are saved, they will always be rerun. You can reset these failure cases by deleting the previously mentioned file `previously-caught-failures.json`.
 
-```
-[]
-```
 
 ##### Good Luck :)
