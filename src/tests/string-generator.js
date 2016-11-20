@@ -5,10 +5,9 @@ const generate = require('../string-generator');
 describe("string-generator", function() {
 
   describe("getRandomCharacter", function() {
-    let alphaChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    let charSet = new Set(alphaChars.split(''));
+    let charSet = new Set(generate.alphaChars.split(''));
 
-    it("should always generate a single letters from [a-zA-Z]", function() {
+    it("should always generate a single letters from the alphaChars property", function() {
       for(let i = 0; i < 10000; i++) {
         let char = generate.getRandomCharacter();
         assert.isTrue(charSet.has(char), char);

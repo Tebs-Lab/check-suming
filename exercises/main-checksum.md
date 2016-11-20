@@ -21,7 +21,7 @@ npm test fnOne fnTwo
 
 ```
 
-The test suite utilizes random strings as input and then uses several techniques to "corrupt" the data. Look at `/src/corrupt-string.js` to learn more about the corruption tactics.
+The test suite utilizes random strings as input and then uses several techniques to "corrupt" the data. Look at `/src/test/corrupt-string.js` to learn more about the corruption tactics.
 
 ## What Should My Function Do?
 

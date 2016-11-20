@@ -12,7 +12,7 @@ module.exports = {
     Generate a random character within the allowed string-set for Javascript
   */
   getRandomCharacter: function() {
-    return;
+    return this.alphaChars[Math.floor(Math.random() * this.alphaChars.length)];
   },
 
   /**
@@ -21,7 +21,12 @@ module.exports = {
      @param {integer} length : the length of the generated string
   */
   generateRandomString: function(length){
-    return;
+    let randomString = "";
+    for(let i = 0; i < length; i++) {
+      randomString += this.getRandomCharacter();
+    }
+
+    return randomString;
   },
 
   /**
@@ -31,7 +36,13 @@ module.exports = {
      @param {integer} length : the length of each generated string
   */
   generateRandomStrings: function (number, length) {
-    return;
+    let strings = [];
+
+    for(let i = 0; i < number; i++) {
+      strings.push(this.generateRandomString(length))
+    }
+
+    return strings;
   },
 
   /**
@@ -42,6 +53,12 @@ module.exports = {
      @param {Array} lenghts : the lengths of string samples to generate
   */
   generateRandomSamples: function (n, lengths) {
-    return;
+    let strings = [];
+
+    for(let length of lengths) {
+      strings = strings.concat(this.generateRandomStrings(n, length))
+    }
+
+    return strings;
   }
 }
