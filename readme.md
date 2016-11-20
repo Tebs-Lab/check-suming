@@ -16,7 +16,7 @@ When our data is traveling from computer to computer, it is subject to electrica
 
 ## Examples in Web Development
 
-Internet traffic often depends on the use of checksums to consistently deliver uncorrupted data. For example the [TCP/IP protocols](https://en.wikipedia.org/wiki/Transmission_Control_Protocol) that power internet traffic rely on checksums. [Signed cookies]() and [signed urls]() are also example of using checksums. the [JWT]() standard also uses checksums. If you read the Flame article above, you learned that checksums are also sent along with important software updates and other sensitive digital information.  
+Internet traffic often depends on the use of checksums to consistently deliver uncorrupted data. For example the [TCP/IP protocols](https://en.wikipedia.org/wiki/Transmission_Control_Protocol) that power internet traffic rely on checksums. [Signed cookies](http://www.brunton-spall.co.uk/post/2012/11/08/securing-web-cookies-with-signatures/) and [signed urls](https://docs.djangoproject.com/en/1.10/topics/signing/) are also example of using checksums. The [JWT standard](https://jwt.io/introduction/) standard also uses checksums. If you read the article about the Flame virus above, you learned that checksums are also sent along with important software updates and other sensitive digital information.  
 
 ## How Checksums Work
 
@@ -28,4 +28,4 @@ It is worth noting that both the checksum and the data itself might have been co
 
 ## Now, You Must Practice
 
-Head to the exercises folder for a description of how to use this repository to practice creating and testing checksums. 
+Head to the exercises folder for a description of how to use this repository to practice creating and testing checksums.
