@@ -4,7 +4,7 @@ const fileLocation = __dirname + '/previously-caught-failures.json';
 
 // We load the failures once
 let strData = fs.readFileSync(fileLocation).toString();
-const knownFailures = JSON.parse(strData);
+const knownFailures = [];// JSON.parse(strData);
 
 module.exports = {
     addFailure: function(input, corrupted) {
