@@ -1,8 +1,8 @@
 {
-  "name": "hash-function-interactive-textbook",
-  "version": "0.0.1",
+  "name": "hash-function-learning-repo",
+  "version": "1.0.0",
   "description": "An experimental educational product",
-  "main": "''",
+  "main": "",
   "directories": {
     "test": "./src/tests"
   },
