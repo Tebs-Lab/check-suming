@@ -1,4 +1,4 @@
-# Finally: Writing Checksums
+# Writing Checksums
 
 Now that our code can both generate and corrupt random test data, it's time to make some checksum algorithms!
 

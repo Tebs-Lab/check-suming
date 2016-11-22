@@ -1,0 +1,5 @@
+# Collision Attack
+
+A __collision attack__ is an way to fool a checksum. Previously, we were fooling our checksum by sending random data, or by randomly altering the data. This random testing framework is powerful and often helps programmers find vulnerabilities we did not know about, but hackers want to *exploit* a vulnerability. Random corruption might cause our data to behave strangely, but it's highly unlikely that random corruption would cause the data to suddenly become a virus or other malicious code.
+
+In this section, we're going to create a series of collision attacks, that ultimately will lead us to a better understanding of how to "break" a digital signature. Breaking such a signature could result in being able to spoof encrypted cookies, authentication tokens, and more. This is the same type of attack that allowed the Flame virus creators to fake SSL certificates. __MD5__ and __SHA-1__ are both now considered "broken" due to the efficacy of such __collision attacks__. At the time of this writing it appears that __SHA-256__ remains unbroken. 
