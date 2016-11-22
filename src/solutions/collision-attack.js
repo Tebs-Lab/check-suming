@@ -83,11 +83,7 @@ module.exports = {
 
     const numbers = createIndexTimesNumberMap(checksum, characterSet);
     let collisionObj = generateAllSums(0);
-    return 'aa';
-    // return collisionObj.reduce(function(accum, charOb) {
-    //   return accum + charOb.character;
-    // }, '');
-
+    return collisionObj;
 
     /**
       Now we're using brute force again, but finding the numbers that
@@ -110,13 +106,20 @@ module.exports = {
           positions: {}
         };
       }
-      // console.log(usedInfo.positions);
 
       if(currentSum > checksum) return [];
+
       if(currentSum === checksum){
-        console.log(partial.join(','));
-        tryPartial(numbers, partial);
-        return partial;
+        let collisions = computePotentialCollisions(numbers, partial);
+        if(collisions === false) {
+          return [];
+        }
+
+        for(let c of collisions) {
+          if(checksums.charcodeTimesIndex(c) === checksum) {
+            return [c]
+          }
+        }
       }
 
       let sumsFoundBelow = [];
@@ -155,7 +158,10 @@ module.exports = {
         let newCollision = partial.slice();
         newCollision.push(number);
 
-        sumsFoundBelow.concat(generateAllSums(newSum, newCollision, newUsedInfo));
+        sumsFoundBelow = sumsFoundBelow.concat(generateAllSums(newSum, newCollision, newUsedInfo));
+        if(sumsFoundBelow.length > 0) {
+          return sumsFoundBelow;
+        }
       }
 
       return sumsFoundBelow;
@@ -187,14 +193,44 @@ function cloneUsedInfo(usedInfo) {
   as our collision given the constraints of the numberMap. We use another exhaustive
   recursive search to generate all the strings represented.
 */
-function tryPartial(numberMap, partial) {
-  let collisions = [];
+function computePotentialCollisions(numberMap, partial, partialCollision = []) {
+  let positionCharacterMap = {}
   for(let number of partial) {
     let options = numberMap[number];
-    for(let option in options) {
-      console.log(option);
+    for(let option of options) {
+      if(positionCharacterMap[option.position] === undefined) {
+        positionCharacterMap[option.position] = [];
+      }
+      positionCharacterMap[option.position].push(option.character);
     }
   }
+
+  // Check that it's possible
+  for(let i = 0; i < partial.length; i++) {
+    if(positionCharacterMap[i] === undefined) {
+      return false;
+    }
+  }
+
+  return stringsFromPositionMap(positionCharacterMap);
+}
+
+function stringsFromPositionMap(positionCharacterMap, position = 0, prefix = '') {
+  let stringsBelow = [];
+  if(prefix.length >= Object.keys(positionCharacterMap).length){
+    stringsBelow.push(prefix);
+    return stringsBelow;
+  }
+
+  for(let i = position; i < Object.keys(positionCharacterMap).length; i++) {
+    let characters = positionCharacterMap[i];
+
+    for(let char of characters) {
+      stringsBelow = stringsBelow.concat(stringsFromPositionMap(positionCharacterMap, i+1, prefix + char));
+    }
+  }
+
+  return stringsBelow;
 }
 
 /**
