@@ -16,7 +16,7 @@ module.exports = {
   */
   charcodeSum: function(inputString){
     var sum = 0;
-    for(var i = 0; i < inputString.length; i++) {
+    for(let i = 0; i < inputString.length; i++) {
       sum += inputString.charCodeAt(i);
     }
     return sum;
@@ -28,7 +28,7 @@ module.exports = {
   */
   charcodeTimesIndex: function(inputString){
     var sum = 0;
-    for(var i = 0; i < inputString.length; i++) {
+    for(let i = 0; i < inputString.length; i++) {
       sum += inputString.charCodeAt(i) * (i+1);
     }
 

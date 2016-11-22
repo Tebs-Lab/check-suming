@@ -2,14 +2,14 @@
 const collide = require('../solutions/collision-attack');
 const checksums = require('../solutions/checksum');
 const generate = require('../solutions/string-generator');
-const assert = require('chai').assert
-
-const sampleLengths = [256, 512];
-const testStrings = generate.generateRandomSamples(500, sampleLengths);
+const assert = require('chai').assert;
 
 describe("collision-attack", function() {
 
   describe("collideWithSimpleSum", function() {
+    const sampleLengths = [256, 512];
+    const testStrings = generate.generateRandomSamples(500, sampleLengths);
+
     it("Should always produce a value that matches the input checksum", function(){
       for(let testCase of testStrings) {
         let checksum = checksums.charcodeSum(testCase);
@@ -22,6 +22,9 @@ describe("collision-attack", function() {
   });
 
   describe("collideWithSimpleSumRestricted", function() {
+    const sampleLengths = [256, 512];
+    const testStrings = generate.generateRandomSamples(500, sampleLengths);
+
     it("Should always produce a value that matches the input checksum using only characters from a restricted set", function(){
       // To speed up the tests
       let charSet = new Set(generate.alphaChars.split(''));
@@ -35,7 +38,28 @@ describe("collision-attack", function() {
         for(let character of collisionData) {
           assert.isOk(charSet.has(character), `Restricted character in collision: ${character}`);
         }
+      }
+    });
+  });
 
+  describe("collideWidthIndex", function() {
+    it("Should always produce a value that matches the input checksum using only characters from a restricted set", function(){
+      const sampleLengths = [4, 8, 16];
+      const testStrings = generate.generateRandomSamples(20, sampleLengths);
+
+      // To speed up the tests
+      let charSet = new Set(generate.alphaChars.split(''));
+      this.timeout(30000); // 30 second limit...
+
+      for(let testCase of testStrings) {
+        let checksum = checksums.charcodeTimesIndex(testCase);
+        let collisionData = collide.collideWithIndex(checksum, generate.alphaChars);
+        let collision = checksums.charcodeTimesIndex(collisionData);
+        assert.equal(collision, checksum, `checksum didn't match for test case ${testCase}, returned ${collisionData}`)
+
+        for(let character of collisionData) {
+          assert.isOk(charSet.has(character), `Restricted character in collision: ${character}`);
+        }
       }
     });
   });

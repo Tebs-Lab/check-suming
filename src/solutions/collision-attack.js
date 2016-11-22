@@ -41,22 +41,196 @@ module.exports = {
                                 hash to using the simple sum method
   */
   collideWithSimpleSumRestricted: function(checksum, characterSet) {
+    // Performance optimization, greedily pick bigger charCodes first
+    let charSetOrdered = characterSet.split('').sort(function(a, b) {
+        return b.charCodeAt(0) - a.charCodeAt(0);
+    });
 
+    // See recursive inner function for how this works
     return generateCollision(0, '');
 
-    // I'm using a recursive solution to exhaustively test many solutions
+    /**
+      I'm using a recursive solution to exhaustively test many solutions.
+      A more clever solution could be faster, but this is good enough for
+      our test cases.
+    */
     function generateCollision(currentSum, currentCollision) {
       if(currentSum > checksum) return false;
       if(currentSum === checksum) return currentCollision;
 
-      for(let character of characterSet) {
-        let newSum = currentSum + Number(character.charCodeAt(0));
+      for(let character of charSetOrdered) {
+        let newSum = currentSum + character.charCodeAt(0);
         let collision = generateCollision(newSum, currentCollision + character);
 
-        if(collision !== false) return collision;
+        if(collision) return collision;
       }
 
       return false;
     }
+  },
+
+  /**
+    Given a checksum value produced by the charcodeTimesIndex function
+    return a value that collides with the provided checksum when
+    the charcodeSum function is used to hash the return value.
+
+    Once again, we're restricted to a specific character set.
+
+    @param {integer} checksum : the hash value that our returned string must
+                                hash to using the simple sum method
+  */
+  collideWithIndex: function(checksum, characterSet) {
+
+    const numbers = createIndexTimesNumberMap(checksum, characterSet);
+    let collisionObj = generateAllSums(0);
+    return 'aa';
+    // return collisionObj.reduce(function(accum, charOb) {
+    //   return accum + charOb.character;
+    // }, '');
+
+
+    /**
+      Now we're using brute force again, but finding the numbers that
+      sum to our checksum instead of searching for strings that break
+      the checksum. This problem is actually well studied, and called
+      "The subset sum problem". It's also "NP-Complete", which means
+      many things, but also means we won't be able to generate all
+      such sums. So we have to limit the search space.
+
+      Luckily, we have some very practical limits in the position
+      and character set. Each option in the numberMap can only
+      be used once, for example, since they each represent a
+      character at an individual position in the string.
+    */
+    function generateAllSums(currentSum, partial = [], usedInfo = undefined) {
+      // Default for the usedInfo is complex
+      if(usedInfo === undefined) {
+        usedInfo = {
+          numbers: {},
+          positions: {}
+        };
+      }
+      // console.log(usedInfo.positions);
+
+      if(currentSum > checksum) return [];
+      if(currentSum === checksum){
+        console.log(partial.join(','));
+        tryPartial(numbers, partial);
+        return partial;
+      }
+
+      let sumsFoundBelow = [];
+      for(let number in numbers) {
+        let newUsedInfo = cloneUsedInfo(usedInfo);
+        let usedNumbers = newUsedInfo.numbers;
+        let usedPositions = newUsedInfo.positions;
+
+        // Ignore numbers we have already exhausted
+        let numberUsedCount = newUsedInfo.numbers[number];
+        if(numberUsedCount >= numbers[number].length) {
+          continue;
+        }
+
+        // Increment this number's used count
+        if(usedNumbers[number] === undefined) usedNumbers[number] = 1;
+        else usedNumbers[number] += 1;
+
+        // Ignore numbers that can only be represented in positions we've used
+        // And mark this position as used
+        let openPosition = false;
+        for(let {position} of numbers[number]) {
+
+          if(!usedInfo.positions[position]) {
+            openPosition = true;
+            usedPositions[position] = true;
+            break;
+          }
+        }
+
+        if(!openPosition) {
+          continue;
+        }
+
+        let newSum = currentSum + Number(number);
+        let newCollision = partial.slice();
+        newCollision.push(number);
+
+        sumsFoundBelow.concat(generateAllSums(newSum, newCollision, newUsedInfo));
+      }
+
+      return sumsFoundBelow;
+    }
   }
+}
+
+
+// Quick way to make a deep clone of the usedInfo obj
+function cloneUsedInfo(usedInfo) {
+  let newObj = {
+    numbers: {},
+    positions: {}
+  };
+
+  for(let number in usedInfo.numbers) {
+    newObj.numbers[number] = usedInfo.numbers[number];
+  }
+
+  for(let position in usedInfo.positions) {
+    newObj.positions[position] = usedInfo.positions[position];
+  }
+
+  return newObj;
+}
+
+/**
+  Given a number map, and the subset sum solution, see if we can use this subset
+  as our collision given the constraints of the numberMap. We use another exhaustive
+  recursive search to generate all the strings represented.
+*/
+function tryPartial(numberMap, partial) {
+  let collisions = [];
+  for(let number of partial) {
+    let options = numberMap[number];
+    for(let option in options) {
+      console.log(option);
+    }
+  }
+}
+
+/**
+  This subroutine generates all the single character values
+  based on their position in the output string. We use this to
+  shrink the space of the brute force attack.
+*/
+function createIndexTimesNumberMap(checksum, characteSet) {
+  // Compute the maximum length of the string given the characterSet
+  // and using what we know about the checksum algorithm.
+  let min = characteSet[characteSet.length - 1].charCodeAt(0);
+  let maxLength = 1;
+  let tmpSum = 0;
+  while(tmpSum < checksum) {
+    tmpSum += (maxLength * min);
+    maxLength++;
+  }
+  maxLength -= 1;
+
+  let numbers = {}
+  for(let char of characteSet) {
+    for(let i = 0; i < maxLength; i++) {
+      let charWithVal = {
+        character: char,
+        position: i
+      }
+      let value = char.charCodeAt(0) * (i+1);
+
+      if(numbers[value] === undefined) {
+        numbers[value] = [charWithVal];
+      }
+      else {
+        numbers[value].push(charWithVal);
+      }
+    }
+  }
+
+  return numbers;
 }
