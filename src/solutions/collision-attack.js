@@ -122,36 +122,39 @@ module.exports = {
         }
       }
 
+      // Performance: Compute the numbers we need to work on BEFORE we clone the info
+      let validNumbers = Object.keys(numbers).filter(function(number) {
+
+        let openPosition = false;
+        for(let {position} of numbers[number]) {
+          // console.log(position, usedInfo.positions[position]);
+          if(!usedInfo.positions[position]) {
+            openPosition = true;
+            break;
+          }
+        }
+
+        return openPosition && (!usedInfo.numbers[number] || usedInfo.numbers[number] < numbers[number].length);
+      });
+
       let sumsFoundBelow = [];
-      for(let number in numbers) {
+      for(let number of validNumbers) {
         let newUsedInfo = cloneUsedInfo(usedInfo);
         let usedNumbers = newUsedInfo.numbers;
         let usedPositions = newUsedInfo.positions;
-
-        // Ignore numbers we have already exhausted
-        let numberUsedCount = newUsedInfo.numbers[number];
-        if(numberUsedCount >= numbers[number].length) {
-          continue;
-        }
 
         // Increment this number's used count
         if(usedNumbers[number] === undefined) usedNumbers[number] = 1;
         else usedNumbers[number] += 1;
 
-        // Ignore numbers that can only be represented in positions we've used
-        // And mark this position as used
-        let openPosition = false;
-        for(let {position} of numbers[number]) {
+        // Mark one of the possible positions at this location as used
+        let n = numbers[number];
+        for(let {position} of n) {
 
-          if(!usedInfo.positions[position]) {
-            openPosition = true;
+          if(!usedPositions[position]) {
             usedPositions[position] = true;
             break;
           }
-        }
-
-        if(!openPosition) {
-          continue;
         }
 
         let newSum = currentSum + Number(number);
