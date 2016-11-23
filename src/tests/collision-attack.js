@@ -44,7 +44,7 @@ describe("collision-attack", function() {
 
   describe("collideWidthIndex", function() {
     it("Should always produce a value that matches the input checksum using only characters from a restricted set", function(){
-      const sampleLengths = [4];
+      const sampleLengths = [4, 8, 16, 32, 64];
       const testStrings = generate.generateRandomSamples(10, sampleLengths);
 
       // To speed up the tests
@@ -53,7 +53,7 @@ describe("collision-attack", function() {
 
       for(let testCase of testStrings) {
         let checksum = checksums.charcodeTimesIndex(testCase);
-        let collisionData = collide.collideWithIndex(checksum, generate.alphaChars)[0];
+        let collisionData = collide.collideWithIndex(checksum, generate.alphaChars);
         let collision = checksums.charcodeTimesIndex(collisionData);
         assert.equal(collision, checksum, `checksum didn't match for test case ${testCase}, returned ${collisionData}`)
 

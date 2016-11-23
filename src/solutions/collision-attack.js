@@ -82,8 +82,32 @@ module.exports = {
   collideWithIndex: function(checksum, characterSet) {
 
     const numbers = createIndexTimesNumberMap(checksum, characterSet);
-    let collisionObj = generateAllSums(0);
-    return collisionObj;
+
+    let charSetOrdered = characterSet.split('').sort(function(a, b) {
+        return a.charCodeAt(0) - b.charCodeAt(0);
+    });
+    let maxCharCode = charSetOrdered[0].charCodeAt(0);
+    let fourDigitsOfMax = 10 * maxCharCode;
+
+    // Instead of exhaustively searching, we're "padding" until we've reduced our
+    // actual search space to about 8 digits.
+    let searchSum = checksum;
+    let mockStaringIndex = 9;
+    while(searchSum > fourDigitsOfMax) {
+      searchSum -= mockStaringIndex * maxCharCode;
+      mockStaringIndex += 1;
+    }
+
+    // "unpad" if we take it too far
+    if(searchSum < 0) {
+      searchSum += mockStaringIndex * maxCharCode;
+      mockStaringIndex == 1;
+    }
+
+    console.log(searchSum, checksum, mockStaringIndex, fourDigitsOfMax);
+    let collisionObj = generateAllSums(searchSum, 0);
+    console.log(collisionObj[0], collisionObj[0] + charSetOrdered[0].repeat(mockStaringIndex - 9));
+    return collisionObj[0] + charSetOrdered[0].repeat(mockStaringIndex - 9);
 
     /**
       Now we're using brute force again, but finding the numbers that
@@ -98,7 +122,7 @@ module.exports = {
       be used once, for example, since they each represent a
       character at an individual position in the string.
     */
-    function generateAllSums(currentSum, partial = [], usedInfo = undefined) {
+    function generateAllSums(checksum, currentSum, partial = [], usedInfo = undefined) {
       // Default for the usedInfo is complex
       if(usedInfo === undefined) {
         usedInfo = {
@@ -161,7 +185,7 @@ module.exports = {
         let newCollision = partial.slice();
         newCollision.push(number);
 
-        sumsFoundBelow = sumsFoundBelow.concat(generateAllSums(newSum, newCollision, newUsedInfo));
+        sumsFoundBelow = sumsFoundBelow.concat(generateAllSums(checksum, newSum, newCollision, newUsedInfo));
         if(sumsFoundBelow.length > 0) {
           return sumsFoundBelow;
         }
@@ -227,6 +251,11 @@ function stringsFromPositionMap(positionCharacterMap, position = 0, prefix = '')
 
   for(let i = position; i < Object.keys(positionCharacterMap).length; i++) {
     let characters = positionCharacterMap[i];
+
+    // Impossible -- don't continue, no possible strings below.
+    if(!characters) {
+      return [];
+    }
 
     for(let char of characters) {
       stringsBelow = stringsBelow.concat(stringsFromPositionMap(positionCharacterMap, i+1, prefix + char));
