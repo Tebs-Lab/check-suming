@@ -1,4 +1,4 @@
-var DEFAULT_HASH_FUNCTION = const checksumLib = require('./checksum');
+const DEFAULT_HASH_FUNCTION = require('./checksum').hashCodePrimeMultiplier;
 
 class HashTable {
 
@@ -6,12 +6,16 @@ class HashTable {
     Constructs a new HashTable with a fixed size. This
 
     @param {integer} size - the size of HashTable
-    @param {Function} hashFunction - a function which accepts string input and returns a number
+    @param {Function} hashFunction - a function which accepts string input and returns an integer
   */
-  constructor(size = 32, hashFunction = ) {
+  constructor(size = 32, hashFunction = DEFAULT_HASH_FUNCTION) {
     this.size = size;
     this.__array = new Array(this.size);
-    this.hashFunction = DEFAULT_HASH_FUNCTION;
+
+    // Never allow our hash to return a negative number or non-integer
+    this.hashFunction = function(key) {
+      return Math.abs(hashFunction(key) % this.size);
+    }
   }
 
 
@@ -22,7 +26,8 @@ class HashTable {
     @param {any} value
   */
   add(key, value) {
-
+    let hashCode = this.hashFunction(key);
+    this.__array[hashCode] = value;
   }
 
   /**
@@ -31,7 +36,8 @@ class HashTable {
     @param {string} key
   */
   get(key) {
-
+    let hashCode = this.hashFunction(key);
+    this.__array[hashCode] = value;
   }
 
 
@@ -41,6 +47,9 @@ class HashTable {
     @param {string} key
   */
   remove(key) {
-
+    let hashCode = this.hashFunction(key);
+    this.__array[hashCode] = undefined;
   }
 }
+
+module.exports = HashTable;
