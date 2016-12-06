@@ -1,5 +1,12 @@
 const DEFAULT_HASH_FUNCTION = require('./checksum').hashCodePrimeMultiplier;
 
+class HashItem {
+  constructor(key, value) {
+    this.key = key;
+    this.value = value;
+  }
+}
+
 class HashTable {
 
   /**
@@ -27,7 +34,8 @@ class HashTable {
   */
   add(key, value) {
     let hashCode = this.hashFunction(key);
-    this.__array[hashCode] = value;
+    let item = new HashItem(key, value);
+    this.__array[hashCode] = item;
   }
 
   /**
