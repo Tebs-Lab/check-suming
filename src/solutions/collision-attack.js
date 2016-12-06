@@ -90,27 +90,86 @@ module.exports = {
     @param {string} characterSet : A string with at least one of each allowed character
   */
   collideWithIndex: function(checksum, characterSet) {
-
-    let [maxLength, numbers] = createIndexTimesNumberMap(checksum, characterSet);
-
     let charSetOrdered = characterSet.split('').sort(function(a, b) {
         return a.charCodeAt(0) - b.charCodeAt(0);
     });
+
+    let [maxLength, numbers] = createIndexTimesNumberMap(checksum, charSetOrdered);
+    let positionMap = createPositionMap(numbers);
+
+
     let minCharCode = charSetOrdered[0].charCodeAt(0);
 
     let startingPoint = 0;
     let valueAtPosition = [];
-    for(let i = 1; i < maxLength; i++) {
-      let value = i * minCharCode;
-      valueAtPosition[i-1] = value;
-      startingPoint += value;
+
+    for(let i = 0; i < maxLength; i++) {
+      valueAtPosition[i] = positionMap[i][0];
+      startingPoint += positionMap[i][0].value;
     }
 
+    console.log(valueAtPosition)
     let offBy = checksum - startingPoint;
-    console.log(valueAtPosition);
-
     console.log(startingPoint, checksum, offBy);
+
+    // Now let "hill climb" by changing valueAtPosition towards offBy is 0...
+    // There is a risk that this loops forever, which happens all the time.
+    while(offBy !== 0) {
+      console.log('=================');
+      console.log(valueAtPosition.map(function(a){return a.value}).join(','))
+      console.log(offBy);
+
+      
+
+      for(let i = 0; i < valueAtPosition.length - 1; i++) {
+        let currentValue = valueAtPosition[i];
+        let valuesForPosition = positionMap[i];
+        let newChoice = moveOffsetTowardsZero(offBy, currentValue, valuesForPosition);
+        offBy = offBy - (newChoice.value - currentValue.value);
+        valueAtPosition[i] = newChoice;
+      }
+    }
+
+    return valueAtPosition.map(function(val, idx){
+      return String.fromCharCode(val / (idx + 1));
+    }).join('');
   }
+}
+
+
+function moveOffsetTowardsZero(offBy, currentValue, possibleValues) {
+  let bestItem = currentValue;
+  let bestNewOffset = Math.abs(offBy);
+
+  for(let i = 0; i < possibleValues.length; i++) {
+    let newValue = possibleValues[i].value;
+    let newOffBy = offBy - (newValue - currentValue.value);
+
+    if(Math.abs(newOffBy) < bestNewOffset) {
+      bestItem = possibleValues[i];
+      bestNewOffset = newOffBy;
+    }
+  }
+
+  return bestItem;
+}
+
+function createPositionMap(numbers) {
+  let positionCharacterMap = {}
+  for(let number in numbers) {
+    let options = numbers[number];
+    for(let option of options) {
+      if(positionCharacterMap[option.position] === undefined) {
+        positionCharacterMap[option.position] = [];
+      }
+      positionCharacterMap[option.position].push({
+        character: option.character,
+        value: (option.position+1) * option.character.charCodeAt(0)
+      });
+    }
+  }
+
+  return positionCharacterMap;
 }
 
 /**
