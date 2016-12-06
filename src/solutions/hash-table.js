@@ -14,5 +14,33 @@ class HashTable {
     this.hashFunction = DEFAULT_HASH_FUNCTION;
   }
 
-  
+
+  /**
+    Add any data to the HashTable, storing the passed value at the passed key.
+
+    @param {string} key
+    @param {any} value
+  */
+  add(key, value) {
+
+  }
+
+  /**
+    Retrieve the value stored at the passed key. If the key contains no data, return undefined.
+
+    @param {string} key
+  */
+  get(key) {
+
+  }
+
+
+  /**
+    Remove the item associated with the passed key by setting the associated value to undefined.
+
+    @param {string} key
+  */
+  remove(key) {
+
+  }
 }
