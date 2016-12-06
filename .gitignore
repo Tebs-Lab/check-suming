@@ -1,2 +1,3 @@
 node_modules/
 src/tests/failure-memory/previously-caught-failures.json
+*scratch.js
