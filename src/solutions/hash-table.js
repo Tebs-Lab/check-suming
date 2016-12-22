@@ -1,9 +1,11 @@
 const DEFAULT_HASH_FUNCTION = require('./checksum').hashCodePrimeMultiplier;
 
+// In order to enable chaining, these have a next pointer
 class HashItem {
   constructor(key, value) {
     this.key = key;
     this.value = value;
+    this.next = undefined;
   }
 }
 
@@ -34,8 +36,19 @@ class HashTable {
   */
   add(key, value) {
     let hashCode = this.hashFunction(key);
-    let item = new HashItem(key, value);
-    this.__array[hashCode] = item;
+    let hashItem = new HashItem(key, value);
+    let currentItem = this.__array[hashCode];
+
+    if(currentItem === undefined) {
+      this.__array[hashCode] = hashItem;
+    }
+    else {
+      while(currentItem.next !== undefined) {
+        currentItem = currentItem.next;
+      }
+
+      currentItem.next = hashItem;
+    }
   }
 
   /**
@@ -45,7 +58,17 @@ class HashTable {
   */
   get(key) {
     let hashCode = this.hashFunction(key);
-    this.__array[hashCode] = value;
+    let currentItem = this.__array[hashCode];
+
+    while(currentItem !== undefined && currentItem.key !== key) {
+      currentItem = currentItem.next;
+    }
+
+    if(currentItem) {
+      return currentItem.value
+    }
+
+    return currentItem;
   }
 
 
@@ -56,7 +79,26 @@ class HashTable {
   */
   remove(key) {
     let hashCode = this.hashFunction(key);
-    this.__array[hashCode] = undefined;
+    let previousItem = undefined;
+    let currentItem = this.__array[hashCode];
+
+    while(currentItem !== undefined && currentItem.key !== key) {
+      previousItem = currentItem;
+      currentItem = currentItem.next;
+    }
+
+    // not found
+    if(currentItem === undefined) {
+      return;
+    }
+    // Found, at the first chain
+    else if(previousItem === undefined && currentItem.key === key) {
+      this.__array[hashCode] = undefined;
+    }
+    // Found, anywhere else in the chain
+    else {
+      previousItem.next = currentItem.next
+    }
   }
 }
 
