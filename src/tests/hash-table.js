@@ -15,8 +15,8 @@ describe("hash-table", function() {
     }
   });
 
-  describe("add and get", function() {
-    it("Should be able to add and get values associated with keys without changing the length of the array", function() {
+  describe("set and get", function() {
+    it("Should be able to set and get values associated with keys", function() {
       const tableSize = 32;
       let hashTable = new HashTable(tableSize);
       let prefixs = 'abcde';
@@ -27,14 +27,32 @@ describe("hash-table", function() {
       for(let key of samples) {
         let value = Symbol();
 
-        hashTable.add(key, value);
+        hashTable.set(key, value);
         assert.equal(hashTable.get(key), value);
       }
-
-      assert.equal(hashTable.__array.length, tableSize);
     });
 
-    it("Should be able to add and get even with colliding keys", function() {
+    it("Should replace the value at a matching key if set is called a second time", function() {
+      const tableSize = 32;
+      let hashTable = new HashTable(tableSize);
+      let prefixs = 'abcde';
+
+      let lengths = [2, 4, 8, 16, 32, 64, 256];
+      let samples = generate.generateRandomSamples(5, lengths);
+
+      for(let key of samples) {
+        let value = Symbol();
+
+        hashTable.set(key, value);
+        assert.equal(hashTable.get(key), value);
+
+        let valueTwo = Symbol();
+        hashTable.set(key, valueTwo);
+        assert.equal(hashTable.get(key), valueTwo)
+      }
+    });
+
+    it("Should be able to set and get even with colliding keys", function() {
       let badHashFunction = function(key) {
         return key.charCodeAt(0) || 0;
       }
@@ -51,7 +69,7 @@ describe("hash-table", function() {
           let value = Symbol();
           key = prefix + key;
 
-          hashTable.add(key, value);
+          hashTable.set(key, value);
           assert.equal(hashTable.get(key), value);
         }
       }
@@ -73,7 +91,7 @@ describe("hash-table", function() {
           key = prefix + key;
 
           wellTestedSet.add(key);
-          hashTable.add(key, value);
+          hashTable.set(key, value);
         }
       }
 
@@ -87,8 +105,8 @@ describe("hash-table", function() {
     });
   });
 
-  describe("get, add, and remove", function() {
-    it("using remove should cause a subsequent get to return undefined at the same key even if that key had been added previously", function() {
+  describe("get, set, and remove", function() {
+    it("using remove should cause a subsequent get to return undefined at the same key even if that key had been set previously", function() {
       let hashTable = new HashTable(32);
       let prefixs = 'abcde';
 
@@ -98,7 +116,7 @@ describe("hash-table", function() {
       for(let key of samples) {
         let value = Symbol();
 
-        hashTable.add(key, value);
+        hashTable.set(key, value);
         assert.equal(hashTable.get(key), value);
       }
 
@@ -123,7 +141,7 @@ describe("hash-table", function() {
           key = prefix + key;
 
           wellTestedSet.add(key);
-          hashTable.add(key, value);
+          hashTable.set(key, value);
         }
       }
 

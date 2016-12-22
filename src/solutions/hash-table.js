@@ -29,12 +29,12 @@ class HashTable {
 
 
   /**
-    Add any data to the HashTable, storing the passed value at the passed key.
+    set any data to the HashTable, storing the passed value at the passed key.
 
     @param {string} key
     @param {any} value
   */
-  add(key, value) {
+  set(key, value) {
     let hashCode = this.hashFunction(key);
     let hashItem = new HashItem(key, value);
     let currentItem = this.__array[hashCode];
@@ -43,11 +43,20 @@ class HashTable {
       this.__array[hashCode] = hashItem;
     }
     else {
-      while(currentItem.next !== undefined) {
+      while(currentItem !== undefined) {
+
+        if(key === currentItem.key) {
+          currentItem.value = value;
+          return;
+        }
+
+        if(currentItem.next === undefined) {
+          currentItem.next = hashItem;
+          return;
+        }
+
         currentItem = currentItem.next;
       }
-
-      currentItem.next = hashItem;
     }
   }
 
