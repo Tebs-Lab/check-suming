@@ -93,7 +93,7 @@ class HashTable {
     }
     // Found, at the first chain
     else if(previousItem === undefined && currentItem.key === key) {
-      this.__array[hashCode] = undefined;
+      this.__array[hashCode] = currentItem.next;
     }
     // Found, anywhere else in the chain
     else {

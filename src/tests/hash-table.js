@@ -1,5 +1,5 @@
 'use strict'
-const HashTable = require('../solutions/hash-table');
+const HashTable = require('../hash-table');
 const generate = require('../solutions/string-generator');
 const assert = require('chai').assert
 
@@ -81,7 +81,7 @@ describe("hash-table", function() {
       let secondSamples = generate.generateRandomSamples(5, lengths);
       for(let key of samples) {
         if(!wellTestedSet.has(key)) {
-          assert(hashTable.get(key) === undefined);
+          assert.equal(hashTable.get(key), undefined);
         }
       }
     });
@@ -136,6 +136,7 @@ describe("hash-table", function() {
 
           let value = key;
           key = prefix + key;
+          counter++;
 
           if(counter % 2 === 0) {
             hashTable.remove(key);
@@ -147,10 +148,12 @@ describe("hash-table", function() {
         }
       }
 
+      // Removed better be removed
       for(let key of removed) {
         assert.equal(hashTable.get(key), undefined);
       }
 
+      // left in better be accessible
       for(let key of leftIn) {
         assert.equal(hashTable.get(key), key.slice(1));
       }
