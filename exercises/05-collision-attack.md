@@ -6,11 +6,11 @@ In this section, we're going to create a series of collision attacks, that ultim
 
 ## Your Tasks
 
-You're going to create several hash collision attacks with increasing difficulty.
+You're going to create 3 hash collision attacks with increasing difficulty.
 
-First we're going to create an attack with very no restrictions on output, against an exceptionally weak hash algorithm. Then we're going to restrict the output to alpha characters. Then we're going to make the hash function a little better and continue to use the restricted character set. These first 3 exercises are to get you thinking about collisions in general.
+First we're going to create an attack with very no restrictions on output, against an exceptionally weak hash algorithm. Then we're going to restrict the output to alpha characters. Then we're going to make the hash function a little better and continue to use the restricted character set.
 
-Once we've successfully crafted a few collision attacks using arbitrary data, we're going to put a further restriction on the data: you must send something __useful__. For example, checksums are frequently used as a digital signature on secure content. We're going to simulate "breaking" the signature of something sent to JSON.stringify. Specifically, you're going to attempt to change the userId in cookies like this one:
+For a bonus challenge, consider this further restriction on the data: you must send something __useful__. For example, checksums are frequently used as a digital signature on secure content. We're going to simulate "breaking" the signature of something sent to JSON.stringify. Specifically, you're going to attempt to change the userId in cookies like this one:
 
 ```js
 let data = {
@@ -21,3 +21,5 @@ let payload = JSON.stringify(data);
 ```
 
 We're trying to create a collision attack against this "payload", but where the userId has been changed to 42. In this case, we're pretending to be user number 42 without the receiver realizing that they actually authenticated user 1234. Lucky for us, the receiver only looks in the `userId` property of the data.
+
+How could you write tests and a function that accomplishes this more difficult task?
