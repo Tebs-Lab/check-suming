@@ -37,15 +37,6 @@ module.exports = {
     return a value that collides with the provided checksum when
     the charcodeTimesIndex function is used to hash the return value.
 
-    Once again, we're restricted to a specific character set. Unfortnuately,
-    this checksum can't realistically be broken with a brute force search. Doing
-    so requires solving the "subset-sum" problem, which is NP-Complete. Using a
-    similar strategy to the above becomes quite slow as soon as we need 16-32 digit
-    strings.
-
-    Instead I've used a hill-clibming technique that explores randomly when anytime
-    the hashcode is off by the same amount twice in a row.
-
     @param {integer} checksum : the hash value that our returned string must
                                 hash to using the simple sum method
 
