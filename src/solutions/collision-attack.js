@@ -54,7 +54,8 @@ module.exports = {
     /**
       I'm using a recursive solution to exhaustively test many solutions.
       A more clever solution could be faster, but this is good enough for
-      our test cases.
+      our test cases. In fact, you'll see the more challenging hash-function
+      is broken more quickly than this hash function with a "clever" strategy.
     */
     function generateCollision(currentSum, currentCollision) {
       if(currentSum > checksum) return false;
@@ -74,7 +75,7 @@ module.exports = {
   /**
     Given a checksum value produced by the charcodeTimesIndex function
     return a value that collides with the provided checksum when
-    the charcodeSum function is used to hash the return value.
+    the charcodeTimesIndex function is used to hash the return value.
 
     Once again, we're restricted to a specific character set. Unfortnuately,
     this checksum can't realistically be broken with a brute force search. Doing
@@ -82,61 +83,83 @@ module.exports = {
     similar strategy to the above becomes quite slow as soon as we need 16-32 digit
     strings.
 
-    Instead we're [doing something that takes advantage of the checksum].
+    Instead I've used a hill-clibming technique that explores randomly when anytime
+    the hashcode is off by the same amount twice in a row.
 
     @param {integer} checksum : the hash value that our returned string must
                                 hash to using the simple sum method
 
     @param {string} characterSet : A string with at least one of each allowed character
   */
-  collideWithIndex: function(checksum, characterSet) {
+  collideWithCharCodeTimesIndex: function(checksum, characterSet) {
     let charSetOrdered = characterSet.split('').sort(function(a, b) {
         return a.charCodeAt(0) - b.charCodeAt(0);
     });
 
-    let [maxLength, numbers] = createIndexTimesNumberMap(checksum, charSetOrdered);
-    let positionMap = createPositionMap(numbers);
+    let maxLength = computeMaxLength(checksum, charSetOrdered);
+    let hashContributionMap = createIndexTimesNumberMap(checksum, charSetOrdered);
+    let hashContributionsByPosition = createHashContributionsByPosition(hashContributionMap);
 
-
-    let minCharCode = charSetOrdered[0].charCodeAt(0);
-
-    let startingPoint = 0;
+    // Initialize the collision with each index as the smallest-char-code character
+    let offBy = checksum;
     let valueAtPosition = [];
-
     for(let i = 0; i < maxLength; i++) {
-      valueAtPosition[i] = positionMap[i][0];
-      startingPoint += positionMap[i][0].value;
+      valueAtPosition[i] = hashContributionsByPosition[i][0];
+      offBy -= hashContributionsByPosition[i][0].value;
     }
-
-    console.log(valueAtPosition)
-    let offBy = checksum - startingPoint;
-    console.log(startingPoint, checksum, offBy);
 
     // Now let "hill climb" by changing valueAtPosition towards offBy is 0...
     // There is a risk that this loops forever, which happens all the time.
+    let previousOffBy;
     while(offBy !== 0) {
-      console.log('=================');
-      console.log(valueAtPosition.map(function(a){return a.value}).join(','))
-      console.log(offBy);
 
-      
+      // This means we've reached a "shoulder", explore randomly
+      if(previousOffBy === offBy) {
+        let randomPosition = Math.floor(Math.random() * valueAtPosition.length);
+        let randomChoice = Math.floor(Math.random() * hashContributionsByPosition[randomPosition].length);
 
-      for(let i = 0; i < valueAtPosition.length - 1; i++) {
-        let currentValue = valueAtPosition[i];
-        let valuesForPosition = positionMap[i];
-        let newChoice = moveOffsetTowardsZero(offBy, currentValue, valuesForPosition);
-        offBy = offBy - (newChoice.value - currentValue.value);
-        valueAtPosition[i] = newChoice;
+        let newValue = hashContributionsByPosition[randomPosition][randomChoice];
+        let currentValue = valueAtPosition[randomPosition];
+        valueAtPosition[randomPosition] = newValue;
+
+        previousOffBy = offBy;
+        offBy = offBy - (newValue.value - currentValue.value);
+      }
+      else {
+        for(let i = 0; i < valueAtPosition.length - 1; i++) {
+          let currentValue = valueAtPosition[i];
+          let valuesForPosition = hashContributionsByPosition[i];
+          let newChoice = moveOffsetTowardsZero(offBy, currentValue, valuesForPosition);
+
+          offBy = offBy - (newChoice.value - currentValue.value);
+          valueAtPosition[i] = newChoice;
+        }
+
+        previousOffBy = offBy;
       }
     }
 
     return valueAtPosition.map(function(val, idx){
-      return String.fromCharCode(val / (idx + 1));
+      return val.character;
     }).join('');
   }
 }
 
+//** Private Helper Functions Below This Point **//
 
+/**
+  Given an amount by which the current collision attempt is off from the checksum
+  as well as a value for a particular index, and the possible values for that index
+  return a new character that moves our offBy amount closest to 0.
+
+  @param offBy {integer} -- the amount the current collision is off from the checksum
+
+  @param currentValue {Object} -- an object with keys value and character that represent
+                                  the character in a specific position in our collision
+
+  @param possibleValues {Array} -- an array containing Objects each of the same format of
+                                   currentValue, representing all the choices for this index
+*/
 function moveOffsetTowardsZero(offBy, currentValue, possibleValues) {
   let bestItem = currentValue;
   let bestNewOffset = Math.abs(offBy);
@@ -154,10 +177,20 @@ function moveOffsetTowardsZero(offBy, currentValue, possibleValues) {
   return bestItem;
 }
 
-function createPositionMap(numbers) {
+/**
+  Given an object of the format generated by createIndexTimesNumberMap
+  return a reformatted version of the same data. Specifically in the
+  format where each key is an index for the collision string, and the
+  values are all the possible character/checksum-contribution-value
+  combinations for that index in the collision-string.
+
+  @param hashContributionMap {Object} -- an Object of the format returned from
+                             createIndexTimesNumberMap.
+*/
+function createHashContributionsByPosition(hashContributionMap) {
   let positionCharacterMap = {}
-  for(let number in numbers) {
-    let options = numbers[number];
+  for(let number in hashContributionMap) {
+    let options = hashContributionMap[number];
     for(let option of options) {
       if(positionCharacterMap[option.position] === undefined) {
         positionCharacterMap[option.position] = [];
@@ -173,24 +206,44 @@ function createPositionMap(numbers) {
 }
 
 /**
-  This subroutine generates all the single character values
-  based on their position in the output string. We use this to
-  shrink the space of the brute force attack.
+  Given a checksum value created by the indexTimesCharCode hash
+  compute the maximum length that a colliding string can possibly
+  be. We do this by calculating the sum of using the smallest charCode
+  value in the provided characterSet until that sum exceeds the checksum
+  value.
+
+  @param checksum {integer} -- a checksum value produced by the indexTimesCharCode
+                               hash function.
+
+  @param characterSet {string} -- a string representing the set of allowed characters
+                                  in the collision we wish to create.
+
 */
-function createIndexTimesNumberMap(checksum, characteSet) {
-  // Compute the maximum length of the string given the characterSet
-  // and using what we know about the checksum algorithm.
-  let min = characteSet[characteSet.length - 1].charCodeAt(0);
+function computeMaxLength(checksum, characterSet) {
+  let min = characterSet[characterSet.length - 1].charCodeAt(0);
   let maxLength = 1;
   let tmpSum = 0;
   while(tmpSum < checksum) {
     tmpSum += (maxLength * min);
     maxLength++;
   }
-  maxLength -= 1;
 
-  let numbers = {}
-  for(let char of characteSet) {
+  return maxLength - 1;
+}
+
+/**
+  This subroutine generates all integer values that can be generated
+  given a checksum and a character set. The output maps those integer
+  values to the position and character used to produce that integer.
+
+  For example, 97 maps to {character: a, position: 0}, because the
+  charCode for a is 97, and when it's at the 0th position the indexTimesCharCode
+  strategy multiplies 97 by 1 to produce the value.
+*/
+function createIndexTimesNumberMap(checksum, characterSet) {
+  let maxLength = computeMaxLength(checksum, characterSet);
+  let hashContributionMap = {};
+  for(let char of characterSet) {
     for(let i = 0; i < maxLength; i++) {
       let charWithVal = {
         character: char,
@@ -198,14 +251,14 @@ function createIndexTimesNumberMap(checksum, characteSet) {
       }
       let value = char.charCodeAt(0) * (i+1);
 
-      if(numbers[value] === undefined) {
-        numbers[value] = [charWithVal];
+      if(hashContributionMap[value] === undefined) {
+        hashContributionMap[value] = [charWithVal];
       }
       else {
-        numbers[value].push(charWithVal);
+        hashContributionMap[value].push(charWithVal);
       }
     }
   }
 
-  return [maxLength, numbers];
+  return hashContributionMap;
 }

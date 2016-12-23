@@ -1,5 +1,5 @@
 'use strict'
-const collide = require('../solutions/collision-attack');
+const collide = require('../collision-attack');
 const checksums = require('../solutions/checksum');
 const generate = require('../solutions/string-generator');
 const assert = require('chai').assert;
@@ -42,7 +42,7 @@ describe("collision-attack", function() {
     });
   });
 
-  describe("collideWidthIndex", function() {
+  describe("collideWithCharCodeTimesIndex", function() {
     it("Should always produce a value that matches the input checksum using only characters from a restricted set", function(){
       const sampleLengths = [4, 8, 16, 32, 64];
       const testStrings = generate.generateRandomSamples(10, sampleLengths);
@@ -53,7 +53,7 @@ describe("collision-attack", function() {
 
       for(let testCase of testStrings) {
         let checksum = checksums.charcodeTimesIndex(testCase);
-        let collisionData = collide.collideWithIndex(checksum, generate.alphaChars);
+        let collisionData = collide.collideWithCharCodeTimesIndex(checksum, generate.alphaChars);
         let collision = checksums.charcodeTimesIndex(collisionData);
         assert.equal(collision, checksum, `checksum didn't match for test case ${testCase}, returned ${collisionData}`)
 
