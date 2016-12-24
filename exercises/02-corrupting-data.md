@@ -22,3 +22,9 @@ While some tests are provided to test that your corruption methods are working, 
 ## Remember:
 
 You can skip ahead by using the solutions found in `/src/solutions/corrupt-string.js`. You can also skip ahead and then come back to implementing the corruption techniques yourself after building the checksums. After working on checksum yourself, look at the solutions and see if you can figure out which of my provided solutions are going to be most vulnerable to specific kinds of corruption!
+
+To run the tests for just data corruption, from the root directory run:
+
+```
+mocha src/tests/corrupt-string.js
+```

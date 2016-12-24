@@ -23,3 +23,9 @@ let payload = JSON.stringify(data);
 We're trying to create a collision attack against this "payload", but where the userId has been changed to 42. In this case, we're pretending to be user number 42 without the receiver realizing that they actually authenticated user 1234. Lucky for us, the receiver only looks in the `userId` property of the data.
 
 How could you write tests and a function that accomplishes this more difficult task?
+
+To run the tests for just collision attacks, from the root directory run:
+
+```
+mocha src/tests/collision-attack.js
+```

@@ -48,3 +48,9 @@ In order to combat this, many hash tables will dynamically resize themselves aft
 The tests found here do not put a restriction on how you handle collisions, but they do require you to handle them. Our tests also do not place restrictions on resizing -- in fact our solution does not resize, and so cannot be safely said to be an `O(1)` access/remove/add data structure. Consider challenging yourself to create a dynamic hash table, that automatically resizes itself when many collisions occur.
 
 Now, complete the implementation the hash table class found in the src folder.
+
+To run the tests for just hash tables, from the root directory run:
+
+```
+mocha src/tests/hash-table.js
+```

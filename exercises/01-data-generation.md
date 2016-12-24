@@ -12,3 +12,9 @@ This section is all about the file `/src/string-generator.js`. When you're finis
 4. Generate a larger sample of random data where you can specify a list of lengths and the number of strings to generate for each length.
 
 Complete the string-generator file such that it passes the tests. Remember, if you get stuck or want to skip this step you can use the contents of the file in `/src/solutions/string-generator.js`.
+
+To run the tests for just string generation, from the root directory run:
+
+```
+mocha src/tests/string-generator.js
+```

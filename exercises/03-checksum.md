@@ -20,3 +20,9 @@ Another note: you can pass all the tests by simply returning the inputString its
 Because the tests are random, you may encounter a new failure after running the tests a couple of times. That said, once you've encountered a failure case, it will be saved into a JSON object located at: `/src/tests/failure-memory/previously-caught-failures.json`. This may sound strange if you have not encountered it before, but [Random Testing](https://en.wikipedia.org/wiki/Random_testing) is actually a very powerful and well studied tactic for testing some types of algorithms.
 
 Once these failures are saved, they will always be rerun on subsequent test runs. You can reset these failure cases by deleting the previously mentioned file `previously-caught-failures.json`.
+
+To run the tests for just checksums, from the root directory run:
+
+```
+mocha src/tests/checksum.js
+```
