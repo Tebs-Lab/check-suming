@@ -1,6 +1,6 @@
 'use strict'
 const assert = require('chai').assert
-const generate = require('../string-generator');
+const generate = require('../solutions/string-generator');
 
 describe("string-generator", function() {
 

@@ -1,5 +1,5 @@
 'use strict'
-const collide = require('../collision-attack');
+const collide = require('../solutions/collision-attack');
 const checksums = require('../solutions/checksum');
 const generate = require('../solutions/string-generator');
 const assert = require('chai').assert;

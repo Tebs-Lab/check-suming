@@ -1,5 +1,5 @@
 'use strict'
-const HashTable = require('../hash-table');
+const HashTable = require('../solutions/hash-table');
 const generate = require('../solutions/string-generator');
 const assert = require('chai').assert
 
