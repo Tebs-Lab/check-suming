@@ -11,7 +11,6 @@ describe("hash-table", function() {
 
       assert.isOk(Array.isArray(hashMap.__array));
       assert.equal(hashMap.__array.length, testSize);
-      assert.equal(hashMap.size, testSize);
     }
   });
 
