@@ -1,6 +1,6 @@
 # Generating Random Test Data
 
-[Random Testing](https://en.wikipedia.org/wiki/Random_testing) is a powerful and well studied test paradigm. Random testing is especially powerful when the __input space__ is very large, and thus cannot reasonably be tested in it's entirety. In our case, the input space is "all strings of any length" -- surely that's too large to test.
+[Random Testing](https://en.wikipedia.org/wiki/Random_testing) is a powerful and well studied test paradigm. Random testing is especially powerful when the __input space__ is very large, and thus cannot reasonably be tested in it's entirety. In our case, the input space is "all strings of any length" -- surely that's too large to test exhaustively.
 
 ## Your Task
 
