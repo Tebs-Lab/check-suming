@@ -26,4 +26,3 @@ Open the developer console on the converter pages and see if you can find the fi
   * Make your own version of this website using your code.
   * Add a feature to switch between ascii and other text formats:
     * [Ascii, EBCDIC, and Unicode](https://www.cs.umd.edu/class/sum2003/cmsc311/Notes/Data/ascii.html)
-  * This could be a nice portfolio piece, make it more impressive by implementing hash algorithms in addition to these common string encodings.
